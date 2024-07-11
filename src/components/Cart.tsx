@@ -49,24 +49,24 @@ const Cart = () => {
 
       <SheetContent className="flex w-full flex-col pr-0 sm:max-w-lg">
         <SheetHeader className="space-y-2.5 pr-6">
-          <SheetTitle>Cart ({itemCount})</SheetTitle>
+          <SheetTitle>Carrinho ({itemCount})</SheetTitle>
         </SheetHeader>
 
         {itemCount > 0 ? (
           <>
             <div className="flex w-full flex-col pr-6">
               {/** TODO: cart logic */}
-              cart items
+              Itens do carrinho
             </div>
             <div className="space-y-4 pr-6">
               <Separator />
               <div className="space-y-1.5 text-sm">
                 <div className="flex">
-                  <span className="flex-1">Shipping</span>
-                  <span>Free</span>
+                  <span className="flex-1">Entrega</span>
+                  <span>Grátis</span>
                 </div>
                 <div className="flex">
-                  <span className="flex-1">Transaction Fee</span>
+                  <span className="flex-1">Frete</span>
                   <span>{formatPrice(fee)}</span>
                 </div>
                 <div className="flex">
@@ -83,7 +83,7 @@ const Cart = () => {
                       className: "w-full",
                     })}
                   >
-                    Continue to Checkout
+                    Continue com o pagamento
                   </Link>
                 </SheetTrigger>
               </SheetFooter>
@@ -101,7 +101,7 @@ const Cart = () => {
                 alt="empty shopping cart hippo"
               />
             </div>
-            <div className="text-xl font-semibold">Your cart is empty</div>
+            <div className="text-xl font-semibold">Seu carrinho esta vazio</div>
             <SheetTrigger asChild>
               <Link
                 href="/products"
@@ -111,7 +111,7 @@ const Cart = () => {
                   className: "text-sm text-muted-foreground",
                 })}
               >
-                Add items to your cart to checkout
+                Adicione itens para realizar o pagamento
               </Link>
             </SheetTrigger>
           </div>

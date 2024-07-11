@@ -35,7 +35,7 @@ const Navbar = () => {
                         variant: "ghost",
                       })}
                     >
-                      Sign in
+                      Entrar
                     </Link>
                   )}
 
@@ -52,7 +52,7 @@ const Navbar = () => {
                         variant: "ghost",
                       })}
                     >
-                      Create account
+                      Criar uma conta
                     </Link>
                   )}
 

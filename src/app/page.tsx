@@ -1,4 +1,7 @@
+"use client";
+
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import ProductReel from "@/components/ProductReel";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ArrowDownToLine, CheckCircle, Leaf } from "lucide-react";
 import Image from "next/image";
@@ -6,22 +9,22 @@ import Link from "next/link";
 
 const perks = [
   {
-    name: "Instant Delivery",
+    name: "Entrega Instantânea",
     Icon: ArrowDownToLine,
     description:
-      "Get your assets delivered to your email in seconds and download them right away.",
+      "Receba seus ativos por e-mail em segundos e faça o download imediatamente.",
   },
   {
-    name: "Guaranteed Quality",
+    name: "Qualidade Garantida",
     Icon: CheckCircle,
     description:
-      "Every asset on our platform is verified by our team to ensure our highest quality standards. Not happy? We offer a 30-day refund guarantee.",
+      "Todos os ativos são verificados para garantir alta qualidade. Oferecemos uma garantia de reembolso de 30 dias.",
   },
   {
-    name: "For the Planet",
+    name: "Pelo Planeta",
     Icon: Leaf,
     description:
-      "We've pledged 1% of sales to the preservation and restoration of the natural environment.",
+      "Nos comprometemos a doar 1% das vendas para a preservação e restauração do meio ambiente natural.",
   },
 ];
 
@@ -31,22 +34,22 @@ export default function Home() {
       <MaxWidthWrapper>
         <div className="py-20 mx-auto text-center flex flex-col items-center max-w-3xl">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            Your Marketplace for high-qualid{" "}
-            <span className="text-blue-600">digital assets</span>.
+            Lorem ipsum dolor sit amet{" "}
+            <span className="text-blue-600">adipiscing elit</span>.
           </h1>
           <p className="mt-6 text-lg max-w-prose text-muted-foreground">
-            Wellcome to Marketplace. Every asset on our platform is verified by
-            our team to ensure our highest quality standards.
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+            nisi ut aliquip ex ea commodo consequat.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-6">
             <Link href="/products" className={buttonVariants()}>
-              Browse Trending
+              Excepteur sint
             </Link>
-            <Button variant="ghost">Our quality promise &rarr;</Button>
+            <Button variant="ghost">Duis aute irure dolor &rarr;</Button>
           </div>
         </div>
 
-        {/** TODO: list products */}
+        <ProductReel href="/products?sort=recent" title="Brand new" />
       </MaxWidthWrapper>
 
       <section className="border-t border-gray-200 bg-gray-50">
