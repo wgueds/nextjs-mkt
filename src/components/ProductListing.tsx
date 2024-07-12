@@ -31,11 +31,16 @@ const ProductListing = ({ product, index }: ProductListingProps) => {
     ({ value }) => value === product.category
   )?.label;
 
-  const validUrls = product.images
-    .map((image) => {
-      typeof image === "string" ? image : image.url;
-    })
-    .filter(Boolean) as string[];
+  const validUrls = product.images.map((image) => {
+    return image.url;
+    // console.log(typeof image);
+    // console.log(image);
+    // console.log(image.url);
+    // typeof image === "string" ? image : image.url;
+  });
+  // .filter(Boolean) as string[]
+  console.log("valids");
+  console.log(validUrls);
 
   if (isVisible && product) {
     return (

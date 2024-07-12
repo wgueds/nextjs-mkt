@@ -22,7 +22,7 @@ import { formatPrice } from "@/lib/utils";
 
 const Cart = () => {
   //   const { items } = useCart();
-  const itemCount = 0;
+  const itemCount = 1;
   const fee = 1;
   const [isMounted, setIsMounted] = useState<boolean>(false);
 

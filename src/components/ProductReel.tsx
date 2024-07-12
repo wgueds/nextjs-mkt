@@ -41,11 +41,11 @@ const ProductReel = (props: ProductReelProps) => {
       images: [
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
         },
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J29TE228F3Z4JND9MXNEF7PF.png",
         },
       ],
     },
@@ -59,11 +59,11 @@ const ProductReel = (props: ProductReelProps) => {
       images: [
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
         },
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J21ZDFS7M80PDSQHRS6E5TVR.png",
         },
       ],
     },
@@ -77,11 +77,11 @@ const ProductReel = (props: ProductReelProps) => {
       images: [
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
         },
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J29TE228F3Z4JND9MXNEF7PF.png",
         },
       ],
     },
@@ -95,11 +95,11 @@ const ProductReel = (props: ProductReelProps) => {
       images: [
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J29TE228F3Z4JND9MXNEF7PF.png",
         },
         {
           url:
-            "http://192.168.1.101:5500/storage/products/1/images/77bccf4f-a62e-4d52-83a4-9869d5e9bd85.jpeg",
+            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
         },
       ],
     },
