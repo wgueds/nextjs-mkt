@@ -5,7 +5,7 @@ export const getUser = async (userId: string) => {
 };
 
 export const createUser = async (userData: Record<string, any>) => {
-  return apiFetch(`/users`, {
+  return await apiFetch(`/users`, {
     method: "POST",
     body: JSON.stringify(userData),
   });
