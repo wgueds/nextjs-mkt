@@ -18,6 +18,13 @@ export const sendCodeValidate = async (userData: Record<string, any>) => {
   });
 };
 
+export const resendCodeValidate = async (data: Record<string, any>) => {
+  return await apiFetch("/users/code-resend", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+};
+
 export const updateUser = async (
   userId: string,
   userData: Record<string, any>

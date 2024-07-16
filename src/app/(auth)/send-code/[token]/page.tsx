@@ -7,7 +7,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { z } from "zod";
 import { toast } from "sonner";
-import { sendCodeValidate } from "@/services/userService";
+import { resendCodeValidate, sendCodeValidate } from "@/services/userService";
 import { useRouter } from "next/navigation";
 
 interface PageProps {
@@ -43,6 +43,27 @@ const Page = ({ params }: PageProps) => {
           toast.success("Código validado com sucesso!");
 
           router.push("/sign-in");
+          return;
+        }
+
+        if (response.message) toast.error(response.message);
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Ocorreu algum erro ao enviar o formulário.");
+    }
+  };
+
+  const handleResend = () => {
+    setIsLoading(true);
+
+    try {
+      resendCodeValidate({ hash: token }).then((response) => {
+        setIsLoading(false);
+
+        if (response.success) {
+          toast.info("Código reenviado para o e-mail.");
+
           return;
         }
 
@@ -131,16 +152,26 @@ const Page = ({ params }: PageProps) => {
             </form>
           </div>
 
-          <Link
+          <button
             className={buttonVariants({
               variant: "link",
               className: "gap-1.5",
             })}
-            href="/sign-up"
+            onClick={handleResend}
+            disabled={isLoading}
           >
-            Reenviar código
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Por favor aguarde.
+              </>
+            ) : (
+              <>
+                Reenviar código
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
