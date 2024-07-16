@@ -5,7 +5,14 @@ export const getUser = async (userId: string) => {
 };
 
 export const createUser = async (userData: Record<string, any>) => {
-  return await apiFetch(`/users`, {
+  return await apiFetch("/users", {
+    method: "POST",
+    body: JSON.stringify(userData),
+  });
+};
+
+export const sendCodeValidate = async (userData: Record<string, any>) => {
+  return await apiFetch("/users/code-validation", {
     method: "POST",
     body: JSON.stringify(userData),
   });

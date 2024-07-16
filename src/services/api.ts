@@ -28,14 +28,14 @@ const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
 
         errorMessages.forEach((message) => toast.error(message as string));
 
-        throw new Error(
+        return new Error(
           `Validation Error: ${JSON.stringify(errorDetails.errors)}`
         );
       }
-      throw new Error(`API request failed with status ${response.status}`);
+      return new Error(`API request failed with status ${response.status}`);
     }
 
-    throw new Error(`API request failed with status ${response.status}`);
+    return new Error(`API request failed with status ${response.status}`);
   }
 
   return await response.json();
