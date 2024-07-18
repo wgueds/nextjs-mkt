@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { serialize } from "cookie";
+import Cookies from "js-cookie";
 import apiFetch from "@/services/api";
 
 export default async function handler(
@@ -23,14 +24,20 @@ export default async function handler(
         res.setHeader("Set-Cookie", [
           serialize("_token", token, {
             path: "/",
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            // httpOnly: true,
+            // secure: false,
+            maxAge: oneDay,
+          }),
+          serialize("_user", JSON.stringify(user), {
+            path: "/",
+            // httpOnly: true,
+            // secure: false,
             maxAge: oneDay,
           }),
           serialize("_isLoggedIn", "1", {
             path: "/",
-            httpOnly: false,
-            secure: process.env.NODE_ENV === "production",
+            // httpOnly: false,
+            // secure: false,
             maxAge: oneDay,
           }),
         ]);

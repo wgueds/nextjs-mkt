@@ -13,11 +13,6 @@ import UserAccountNav from "./UserAccountNav";
 
 const Navbar = () => {
   const { userData } = useAuth();
-  // const user = null;
-
-  console.log("==============================");
-  console.log(userData);
-  console.log("==============================");
 
   return (
     <div className="bg-white sticky z-50 top-0 inset-x-0 h-16">

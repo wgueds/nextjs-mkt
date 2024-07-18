@@ -1,11 +1,19 @@
 "use client";
 
 import { User } from "@/interfaces/User";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import Cookies from "js-cookie";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 interface AuthContextProps {
   isLoggedIn: boolean;
   userData: User | null;
+  userToken: null;
   login: (userData: User) => void;
   logout: () => void;
   setIsLoggedIn: (loggedIn: boolean) => void;
@@ -16,7 +24,24 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userToken, setUserToken] = useState(null);
   const [userData, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const storedUser = Cookies.get("_user");
+    const storedUserToken = Cookies.get("_token");
+
+    console.log("Cookies");
+    console.log(storedUser);
+    console.log(storedUserToken);
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    }
+
+    if (storedUserToken) setUserToken(storedUserToken);
+  }, []);
 
   const login = (userData: User) => {
     setIsLoggedIn(true);
@@ -26,6 +51,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setIsLoggedIn(false);
     setUser(null);
+
+    Cookies.remove("_user");
+    Cookies.remove("_token");
   };
 
   return (
@@ -33,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         isLoggedIn,
         userData,
+        userToken,
         login,
         logout,
         setIsLoggedIn,

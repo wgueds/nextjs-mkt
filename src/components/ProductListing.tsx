@@ -39,8 +39,9 @@ const ProductListing = ({ product, index }: ProductListingProps) => {
     // typeof image === "string" ? image : image.url;
   });
   // .filter(Boolean) as string[]
-  console.log("valids");
-  console.log(validUrls);
+
+  // console.log("valids");
+  // console.log(validUrls);
 
   if (isVisible && product) {
     return (
