@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import Providers from "@/components/Providers";
 import { Toaster } from "sonner";
-// import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,11 +28,10 @@ export default function RootLayout({
           <Providers>
             <Navbar />
             <div className="flex-grow flex-1">{children}</div>
-            {/* <ToastContainer /> */}
           </Providers>
         </main>
 
-        <Toaster position="top-center" richColors closeButton />
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

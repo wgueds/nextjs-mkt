@@ -1,12 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import { Icons } from "./Icons";
 import NavItems from "./NavItems";
 import { buttonVariants } from "./ui/button";
 import Cart from "./Cart";
+import { User } from "@/interfaces/User";
+import { useState } from "react";
 
 const Navbar = () => {
-  const user = null;
+  const [user, setUser] = useState<User | null>(null);
 
   return (
     <div className="bg-white sticky z-50 top-0 inset-x-0 h-16">

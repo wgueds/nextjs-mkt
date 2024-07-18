@@ -34,7 +34,7 @@ const Page = () => {
     setIsLoading(true);
 
     try {
-      const response = createUser(data).then((response) => {
+      createUser(data).then((response) => {
         setIsLoading(false);
 
         if (response.success) {

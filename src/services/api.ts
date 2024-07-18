@@ -32,34 +32,10 @@ const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
           `Validation Error: ${JSON.stringify(errorDetails.errors)}`
         );
       }
-      return new Error(`API request failed with status ${response.status}`);
     }
-
-    return new Error(`API request failed with status ${response.status}`);
   }
 
   return await response.json();
 };
 
 export default apiFetch;
-
-// const getApiClient = (): AxiosInstance => {
-//   const client = axios.create({
-//     baseURL: process.env.API_BASE_URL,
-//     headers: {
-//       ...defaultHeaders,
-//     },
-//   });
-
-//   client.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//       // Trate erros globais aqui, se necessário
-//       return Promise.reject(error);
-//     }
-//   );
-
-//   return client;
-// };
-
-// export default getApiClient;

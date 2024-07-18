@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
-import Link from "next/link";
 import { z } from "zod";
 import { toast } from "sonner";
 import { resendCodeValidate, sendCodeValidate } from "@/services/userService";

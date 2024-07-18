@@ -9,22 +9,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-
-import {
-  AuthCredentialsValidator,
-  TAuthCredentialsValidator,
-} from "@/lib/validators/account-credentials-validator";
-// import { trpc } from "@/trpc/client";
-// import { toast } from "sonner";
-// import { ZodError } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  LoginCredentialsValidator,
+  TLoginCredentialsValidator,
+} from "@/lib/validators/login-credentials-validator";
+import { toast } from "sonner";
+import { useState } from "react";
+import { loginUser } from "@/services/userService";
+import { User } from "@/interfaces/User";
 
 const Page = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isSeller = searchParams.get("as") === "seller";
   const origin = searchParams.get("origin");
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState<User | null>(null);
   const continueAsSeller = () => {
     router.push("?as=seller");
   };
@@ -37,49 +38,37 @@ const Page = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TAuthCredentialsValidator>({
-    resolver: zodResolver(AuthCredentialsValidator),
+  } = useForm<TLoginCredentialsValidator>({
+    resolver: zodResolver(LoginCredentialsValidator),
   });
 
-  //   const { mutate: signIn, isLoading } = trpc.auth.signIn.useMutation({
-  //     onSuccess: async () => {
-  //       toast.success("Signed in successfully");
+  const onSubmit = async ({ email, password }: TLoginCredentialsValidator) => {
+    setIsLoading(true);
 
-  //       router.refresh();
+    try {
+      setIsLoading(false);
 
-  // if (origin) {
-  //   router.push(`/${origin}`);
-  //   return;
-  // }
+      const response = await loginUser({ email, password });
 
-  //       if (isSeller) {
-  //         router.push("/sell");
-  //         return;
-  //       }
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
 
-  //       router.push("/");
-  //     },
-  //     onError: (err) => {
-  //       if (err.data?.code === "UNAUTHORIZED") {
-  //         toast.error("Invalid email or password.");
-  //       }
-  //     },
-  //   });
+      const { user } = response;
+      setUserData(user);
 
-  //   const onSubmit = ({ email, password }: TAuthCredentialsValidator) => {
-  //     signIn({ email, password });
-  //   };
+      toast.success(`Bem vindo ${user.name}`);
 
-  const isLoading = false;
-  const onSubmit = ({ email, password }: TAuthCredentialsValidator) => {
-    // if (origin) {
-    //   router.push(`/${origin}`);
-    //   return;
-    // }
+      if (origin) {
+        router.push(`/${origin}`);
+        return;
+      }
 
-    console.log("opaa");
-
-    router.push("/");
+      router.push("/");
+    } catch (error) {
+      toast.error("Ocorreu algum erro ao enviar o formulário.");
+    }
   };
 
   return (
