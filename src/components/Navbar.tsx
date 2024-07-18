@@ -8,9 +8,16 @@ import { buttonVariants } from "./ui/button";
 import Cart from "./Cart";
 import { User } from "@/interfaces/User";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import UserAccountNav from "./UserAccountNav";
 
 const Navbar = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { userData } = useAuth();
+  // const user = null;
+
+  console.log("==============================");
+  console.log(userData);
+  console.log("==============================");
 
   return (
     <div className="bg-white sticky z-50 top-0 inset-x-0 h-16">
@@ -32,7 +39,7 @@ const Navbar = () => {
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  {user ? null : (
+                  {userData ? null : (
                     <Link
                       href="/sign-in"
                       className={buttonVariants({
@@ -43,12 +50,12 @@ const Navbar = () => {
                     </Link>
                   )}
 
-                  {user ? null : (
+                  {userData ? null : (
                     <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
                   )}
 
-                  {user ? (
-                    <p></p>
+                  {userData ? (
+                    <UserAccountNav user={userData} />
                   ) : (
                     <Link
                       href="/sign-up"
@@ -60,11 +67,11 @@ const Navbar = () => {
                     </Link>
                   )}
 
-                  {user ? (
+                  {userData ? (
                     <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
                   ) : null}
 
-                  {user ? null : (
+                  {userData ? null : (
                     <div className="flex lg:ml-6">
                       <span
                         className="h-6 w-px bg-gray-200"

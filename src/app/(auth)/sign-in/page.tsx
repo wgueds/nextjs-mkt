@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { loginUser } from "@/services/userService";
 import { User } from "@/interfaces/User";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Page = () => {
   const searchParams = useSearchParams();
@@ -26,6 +27,7 @@ const Page = () => {
   const origin = searchParams.get("origin");
   const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserData] = useState<User | null>(null);
+  const { login, logout } = useAuth();
   const continueAsSeller = () => {
     router.push("?as=seller");
   };
@@ -52,11 +54,13 @@ const Page = () => {
 
       if (!response.success) {
         toast.error(response.message);
+        logout();
         return;
       }
 
       const { user } = response;
       setUserData(user);
+      login(user);
 
       toast.success(`Bem vindo ${user.name}`);
 
