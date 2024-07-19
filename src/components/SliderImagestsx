@@ -1,0 +1,11 @@
+
+
+interface ImagesProps {
+  images: object;
+}
+
+const SliderImages = (props: ImagesProps) => {
+  return ()
+};
+
+export default SliderImages;
