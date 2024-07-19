@@ -35,4 +35,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+.env
+
 # Ref: https://www.youtube.com/watch?v=06g6YJ6JCJU
