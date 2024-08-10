@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ProductListing from "@/components/ProductListing";
+import Products from "@/data/products";
 
 interface ProductReelProps {
   title: string;
@@ -30,80 +31,6 @@ const ProductReel = (props: ProductReelProps) => {
   //   const products = queryResults?.pages.flatMap((page) => page.items);
 
   const isLoading = false;
-  const products = [
-    {
-      id: 1,
-      category: "Templates",
-      name: "Product 001",
-      subtitle: "Loren ipsun",
-      href: "/loren",
-      price: 99,
-      images: [
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
-        },
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J29TE228F3Z4JND9MXNEF7PF.png",
-        },
-      ],
-    },
-    {
-      id: 2,
-      category: "Templates",
-      name: "Product 002",
-      subtitle: "Loren ipsun",
-      href: "/loren",
-      price: 99,
-      images: [
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
-        },
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J21ZDFS7M80PDSQHRS6E5TVR.png",
-        },
-      ],
-    },
-    {
-      id: 3,
-      category: "Templates",
-      name: "Product 003",
-      subtitle: "Loren ipsun",
-      href: "/loren",
-      price: 99,
-      images: [
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
-        },
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J29TE228F3Z4JND9MXNEF7PF.png",
-        },
-      ],
-    },
-    {
-      id: 4,
-      category: "Templates",
-      name: "Product 004",
-      subtitle: "Loren ipsun",
-      href: "/loren",
-      price: 99,
-      images: [
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J29TE228F3Z4JND9MXNEF7PF.png",
-        },
-        {
-          url:
-            "http://192.168.1.101:5500/storage/products/01J21Y1H1KDT48E9JWEYQ7SGGH.jpg",
-        },
-      ],
-    },
-  ];
 
   //   let map: (Product | null)[] = [];
 
@@ -140,7 +67,7 @@ const ProductReel = (props: ProductReelProps) => {
       <div className="relative">
         <div className="mt-6 flex items-center w-full">
           <div className="w-full grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-y-10 lg:gap-x-8">
-            {products.map((product, i) => (
+            {Products.map((product, i) => (
               <ProductListing
                 key={`product-${i}`}
                 product={product}
