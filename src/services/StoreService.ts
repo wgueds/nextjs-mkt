@@ -1,5 +1,5 @@
 import apiFetch from "./api";
 
-export const getUser = async (store?: string) => {
+export const getUserCategories = async (store?: string) => {
   return apiFetch(`/categories/${store}`);
 };

@@ -49,8 +49,8 @@ export default function Home() {
           </div>
         </div>
 
-        <ProductReel href="/products?sort=recent" title="Mais vendidos" />
-        <ProductReel href="/products?sort=recent" title="Promoções" />
+        <ProductReel sort="" title="Mais vendidos" />
+        <ProductReel sort="" title="Promoções" />
       </MaxWidthWrapper>
 
       <section className="border-t border-gray-200 bg-gray-50">

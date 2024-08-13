@@ -1,16 +1,20 @@
 "use client";
 
-// import { Product } from "@/payload-types";
 import { useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 import { cn, formatPrice } from "@/lib/utils";
 import { PRODUCT_CATEGORIES } from "@/config";
 import ImageSlider from "./ImageSlider";
-// import ImageSlider from "./ImageSlider";
 
 interface ProductListingProps {
-  product: object;
+  product: {
+    product_id: number;
+    name: string;
+    category: string;
+    price: string;
+    images: Array<{ highlight: number; url_image: string }>;
+  };
   index: number;
 }
 
@@ -31,40 +35,28 @@ const ProductListing = ({ product, index }: ProductListingProps) => {
     ({ value }) => value === product.category
   )?.label;
 
-  const validUrls = product.images.map((image) => {
-    return image.url;
-    // console.log(typeof image);
-    // console.log(image);
-    // console.log(image.url);
-    // typeof image === "string" ? image : image.url;
-  });
-  // .filter(Boolean) as string[]
+  const validUrls = product.images.map((image) => image.url_image);
 
-  // console.log("valids");
-  // console.log(validUrls);
+  return (
+    <Link
+      className={cn("invisible h-full w-full cursor-pointer group/main", {
+        "visible animate-in fade-in-5": isVisible,
+      })}
+      href={`/product/${product.product_id}`}
+    >
+      <div className="flex flex-col w-full">
+        <ImageSlider urls={validUrls} />
 
-  if (isVisible && product) {
-    return (
-      <Link
-        className={cn("invisible h-full w-full cursor-pointer group/main", {
-          "visible animate-in fade-in-5": isVisible,
-        })}
-        href={`/product/${product.id}`}
-      >
-        <div className="flex flex-col w-full">
-          <ImageSlider urls={validUrls} />
-
-          <h3 className="mt-4 font-medium text-sm text-gray-700">
-            {product.name}
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">{label}</p>
-          <p className="mt-1 font-medium text-sm text-gray-900">
-            {formatPrice(product.price)}
-          </p>
-        </div>
-      </Link>
-    );
-  }
+        <h3 className="mt-4 font-medium text-sm text-gray-700">
+          {product.name}
+        </h3>
+        <p className="mt-1 text-sm text-gray-500">{label}</p>
+        <p className="mt-1 font-medium text-sm text-gray-900">
+          {formatPrice(parseFloat(product.price))}
+        </p>
+      </div>
+    </Link>
+  );
 };
 
 const ProductPlaceholder = () => {

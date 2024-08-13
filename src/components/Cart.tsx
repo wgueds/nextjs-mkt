@@ -14,7 +14,8 @@ import { Separator } from "./ui/separator";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 import Image from "next/image";
-// import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/useCart";
+import { CartItem } from "@/interfaces/Cart";
 // import { ScrollArea } from "./ui/scroll-area";
 // import CartItem from "./CartItem";
 import { useEffect, useState } from "react";
@@ -25,6 +26,11 @@ const Cart = () => {
   const itemCount = 1;
   const fee = 1;
   const [isMounted, setIsMounted] = useState<boolean>(false);
+  const { state, dispatch } = useCart();
+
+  const removeFromCart = (item: CartItem) => {
+    dispatch({ type: "REMOVE_FROM_CART", payload: item });
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -55,12 +61,23 @@ const Cart = () => {
         {itemCount > 0 ? (
           <>
             <div className="flex w-full flex-col pr-6">
-              {/** TODO: cart logic */}
-              Itens do carrinho
+              <ul>
+                {state.items.map((item) => (
+                  <li key={item.id}>
+                    {item.name} - ${item.price} x {item.quantity}
+                    <button onClick={() => removeFromCart(item)}>Remove</button>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="space-y-4 pr-6">
               <Separator />
               <div className="space-y-1.5 text-sm">
+                <h3>Total: ${state.totalAmount.toFixed(2)}</h3>
+                <button onClick={() => dispatch({ type: "CLEAR_CART" })}>
+                  Clear Cart
+                </button>
+
                 <div className="flex">
                   <span className="flex-1">Entrega</span>
                   <span>Grátis</span>
