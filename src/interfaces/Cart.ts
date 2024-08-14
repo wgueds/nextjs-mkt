@@ -1,11 +1,13 @@
-export interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
+// export interface CartItem {
+//   id: string;
+//   name: string;
+//   price: number;
+//   quantity: number;
+// }
+
+import { ProductDetail } from "@/interfaces/Products";
 
 export interface CartState {
-  items: CartItem[];
+  items: ProductDetail[];
   totalAmount: number;
 }

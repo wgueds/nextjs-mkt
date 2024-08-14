@@ -6,17 +6,18 @@ import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PRODUCT_CATEGORIES } from "@/config";
 import { formatPrice } from "@/lib/utils";
-import { Check, Shield } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
 import { getProduct } from "@/services/ProductsService";
-import { ProductDetail } from "@/interfaces/Product";
-import { CartItem } from "@/interfaces/Cart";
+import { ProductDetail } from "@/interfaces/Products";
+import { Skeleton } from "@/components/ui/skeleton";
+import ProductNotFound from "@/components/ProductNotFound";
+// import { CartItem } from "@/interfaces/Cart";
 
 interface PageProps {
   params: {
     productId: string;
-    item: CartItem;
+    item: ProductDetail;
   };
 }
 
@@ -27,6 +28,7 @@ const BREADCRUMBS = [
 
 const Page = ({ params }: PageProps) => {
   const { productId, item } = params;
+  const { dispatch } = useCart();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -45,16 +47,40 @@ const Page = ({ params }: PageProps) => {
     fetchProduct();
   }, [productId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!product) return <p>Product not found</p>;
+  if (loading)
+    return (
+      <MaxWidthWrapper className="bg-white">
+        <div className="bg-white">
+          <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
+            <div className="lg:max-w-lg lg:self-end">
+              <Skeleton className="h-8 w-3/4 mb-4" />
+
+              <section className="mt-4">
+                <Skeleton className="h-6 w-1/4 mb-4" />
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-5/6" />
+              </section>
+            </div>
+
+            <div className="mt-10 lg:col-start-2 lg:row-span-2 lg:mt-0 lg:self-center">
+              <Skeleton className="aspect-square rounded-lg" />
+            </div>
+
+            <div className="mt-10 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start">
+              <Skeleton className="h-12 w-full" />
+            </div>
+          </div>
+        </div>
+      </MaxWidthWrapper>
+    );
+
+  if (!product) return <ProductNotFound />;
 
   const label = PRODUCT_CATEGORIES.find(
     ({ value }) => value === product.categories[0] // Assuming categories array is used for label lookup
   )?.label;
 
   const validUrls = product.images.map((image) => image.url_image);
-
-  const { dispatch } = useCart();
 
   const addToCart = (product: ProductDetail) => {
     // console.log(product);
@@ -65,7 +91,6 @@ const Page = ({ params }: PageProps) => {
     <MaxWidthWrapper className="bg-white">
       <div className="bg-white">
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
-          {/* Product Details */}
           <div className="lg:max-w-lg lg:self-end">
             <ol className="flex items-center space-x-2">
               {BREADCRUMBS.map((breadcrumb, i) => (
@@ -114,27 +139,15 @@ const Page = ({ params }: PageProps) => {
                   {product.description}
                 </p>
               </div>
-
-              {/* <div className="mt-6 flex items-center">
-                <Check
-                  aria-hidden="true"
-                  className="h-5 w-5 flex-shrink-0 text-green-500"
-                />
-                <p className="ml-2 text-sm text-muted-foreground">
-                  Eligible for instant delivery
-                </p>
-              </div> */}
             </section>
           </div>
 
-          {/* Product images */}
           <div className="mt-10 lg:col-start-2 lg:row-span-2 lg:mt-0 lg:self-center">
             <div className="aspect-square rounded-lg">
               <ImageSlider urls={validUrls} />
             </div>
           </div>
 
-          {/* add to cart part */}
           <div className="mt-10 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start">
             <div>
               <div className="mt-10">
@@ -145,17 +158,6 @@ const Page = ({ params }: PageProps) => {
                   Adicionar ao carrinho &rarr;
                 </Button>
               </div>
-              {/* <div className="mt-6 text-center">
-                <div className="group inline-flex text-sm text-medium">
-                  <Shield
-                    aria-hidden="true"
-                    className="mr-2 h-5 w-5 flex-shrink-0 text-gray-400"
-                  />
-                  <span className="text-muted-foreground hover:text-gray-700">
-                    30 Day Return Guarantee
-                  </span>
-                </div>
-              </div> */}
             </div>
           </div>
         </div>

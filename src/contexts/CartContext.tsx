@@ -1,11 +1,12 @@
 "use client";
 
 import React, { createContext, useReducer, ReactNode, Dispatch } from "react";
-import { CartState, CartItem } from "../interfaces/Cart";
+import { CartState } from "../interfaces/Cart";
+import { ProductDetail } from "@/interfaces/Products";
 
 type CartAction =
-  | { type: "ADD_TO_CART"; payload: CartItem }
-  | { type: "REMOVE_FROM_CART"; payload: CartItem }
+  | { type: "ADD_TO_CART"; payload: ProductDetail }
+  | { type: "REMOVE_FROM_CART"; payload: ProductDetail }
   | { type: "CLEAR_CART" };
 
 const initialState: CartState = {
@@ -17,7 +18,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_TO_CART":
       const existingCartItemIndex = state.items.findIndex(
-        (item) => item.id === action.payload.id
+        (item) => item.product_id === action.payload.product_id
       );
       const existingCartItem = state.items[existingCartItemIndex];
 
@@ -35,7 +36,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       return {
         items: updatedItems,
-        totalAmount: state.totalAmount + action.payload.price,
+        totalAmount: state.totalAmount + action.payload.sale_price,
       };
 
     case "REMOVE_FROM_CART":
@@ -45,7 +46,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       return {
         items: filteredItems,
-        totalAmount: state.totalAmount - action.payload.price,
+        totalAmount: state.totalAmount - action.payload.sale_price,
       };
 
     case "CLEAR_CART":

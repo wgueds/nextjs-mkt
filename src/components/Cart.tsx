@@ -10,25 +10,26 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { Separator } from "./ui/separator";
-// import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 import Image from "next/image";
 import { useCart } from "@/hooks/useCart";
-import { CartItem } from "@/interfaces/Cart";
-// import { ScrollArea } from "./ui/scroll-area";
-// import CartItem from "./CartItem";
+import { ProductDetail } from "@/interfaces/Products";
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Trash2Icon } from "lucide-react";
 
 const Cart = () => {
-  //   const { items } = useCart();
-  const itemCount = 1;
-  const fee = 1;
+  // const { items } = useCart();
+
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { state, dispatch } = useCart();
 
-  const removeFromCart = (item: CartItem) => {
+  const itemCount = state.items.length;
+  const fee = 1;
+
+  const removeFromCart = (item: ProductDetail) => {
     dispatch({ type: "REMOVE_FROM_CART", payload: item });
   };
 
@@ -63,9 +64,17 @@ const Cart = () => {
             <div className="flex w-full flex-col pr-6">
               <ul>
                 {state.items.map((item) => (
-                  <li key={item.id}>
+                  <li key={item.product_id} className="flex justify-between">
                     {item.name} - ${item.price} x {item.quantity}
-                    <button onClick={() => removeFromCart(item)}>Remove</button>
+                    {/* <button onClick={() => removeFromCart(item)}>Remove</button> */}
+                    <Button
+                      variant="link"
+                      size="icon"
+                      className="h-6 w-8"
+                      onClick={() => removeFromCart(item)}
+                    >
+                      <Trash2Icon className="h-4 w-4 text-red-700" />
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -73,25 +82,27 @@ const Cart = () => {
             <div className="space-y-4 pr-6">
               <Separator />
               <div className="space-y-1.5 text-sm">
-                <h3>Total: ${state.totalAmount.toFixed(2)}</h3>
-                <button onClick={() => dispatch({ type: "CLEAR_CART" })}>
-                  Clear Cart
-                </button>
+                {/* <h3>Total: ${state.totalAmount.toFixed(2)}</h3> */}
 
-                <div className="flex">
+                {/* <button onClick={() => dispatch({ type: "CLEAR_CART" })}>
+                  Limpar
+                </button> */}
+
+                {/* <div className="flex">
                   <span className="flex-1">Entrega</span>
                   <span>Grátis</span>
                 </div>
+
                 <div className="flex">
                   <span className="flex-1">Frete</span>
                   <span>{formatPrice(fee)}</span>
-                </div>
+                </div> */}
+
                 <div className="flex">
                   <span className="flex-1">Total</span>
-                  <span>{formatPrice(fee)}</span>
+                  <span>{formatPrice(state.totalAmount)}</span>
                 </div>
               </div>
-
               <SheetFooter>
                 <SheetTrigger asChild>
                   <Link
@@ -104,6 +115,15 @@ const Cart = () => {
                   </Link>
                 </SheetTrigger>
               </SheetFooter>
+
+              <Button
+                variant="link"
+                size="icon"
+                onClick={() => dispatch({ type: "CLEAR_CART" })}
+                className="w-full content-center text-gray-600 text-xs"
+              >
+                Limpar carrinho
+              </Button>
             </div>
           </>
         ) : (
