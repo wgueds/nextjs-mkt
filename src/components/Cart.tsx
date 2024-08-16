@@ -19,12 +19,12 @@ import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Cart = () => {
-  // const { items } = useCart();
-
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { state, dispatch } = useCart();
+  const { isLoggedIn, userData } = useAuth();
 
   const itemCount = state.items.length;
   const fee = 1;
@@ -35,12 +35,23 @@ const Cart = () => {
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
 
-  //   const cartTotal = items.reduce(
-  //     (total, { product }) => total + product.price,
-  //     0
-  //   );
+    if (isLoggedIn && userData) {
+      // Load the data from localStorage using the user ID
+      const storedCart = localStorage.getItem(`cart_${userData.id}`);
+
+      if (storedCart) {
+        const cartData = JSON.parse(storedCart);
+
+        if (cartData) {
+          dispatch({ type: "CLEAR_CART" });
+          cartData.items.forEach((item: ProductDetail) => {
+            dispatch({ type: "ADD_TO_CART", payload: item });
+          });
+        }
+      }
+    }
+  }, [dispatch, isLoggedIn, userData]);
 
   return (
     <Sheet>
@@ -66,7 +77,6 @@ const Cart = () => {
                 {state.items.map((item) => (
                   <li key={item.product_id} className="flex justify-between">
                     {item.name} - ${item.price} x {item.quantity}
-                    {/* <button onClick={() => removeFromCart(item)}>Remove</button> */}
                     <Button
                       variant="link"
                       size="icon"
@@ -82,22 +92,6 @@ const Cart = () => {
             <div className="space-y-4 pr-6">
               <Separator />
               <div className="space-y-1.5 text-sm">
-                {/* <h3>Total: ${state.totalAmount.toFixed(2)}</h3> */}
-
-                {/* <button onClick={() => dispatch({ type: "CLEAR_CART" })}>
-                  Limpar
-                </button> */}
-
-                {/* <div className="flex">
-                  <span className="flex-1">Entrega</span>
-                  <span>Grátis</span>
-                </div>
-
-                <div className="flex">
-                  <span className="flex-1">Frete</span>
-                  <span>{formatPrice(fee)}</span>
-                </div> */}
-
                 <div className="flex">
                   <span className="flex-1">Total</span>
                   <span>{formatPrice(state.totalAmount)}</span>
@@ -138,7 +132,7 @@ const Cart = () => {
                 alt="empty shopping cart hippo"
               />
             </div>
-            <div className="text-xl font-semibold">Seu carrinho esta vazio</div>
+            <div className="text-xl font-semibold">Seu carrinho está vazio</div>
             <SheetTrigger asChild>
               <Link
                 href="/products"

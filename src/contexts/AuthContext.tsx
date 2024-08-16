@@ -31,10 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = Cookies.get("_user");
     const storedUserToken = Cookies.get("_token");
 
-    // console.log("Cookies");
-    // console.log(storedUser);
-    // console.log(storedUserToken);
-
     if (storedUser) {
       setUser(JSON.parse(storedUser));
       setIsLoggedIn(true);
@@ -75,6 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = (): AuthContextProps => {
   const context = useContext(AuthContext);
+
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }

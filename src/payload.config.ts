@@ -14,7 +14,7 @@ export default buildConfig({
     bundler: webpackBundler(),
     meta: {
       titleSuffix: "- MKT",
-      favicon: "/favicon.ico",
+      favicon: "/favicon.png",
       ogImage: "/thumbnail.jpg",
     },
   },

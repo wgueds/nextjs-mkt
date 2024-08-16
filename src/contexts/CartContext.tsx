@@ -1,8 +1,15 @@
 "use client";
 
-import React, { createContext, useReducer, ReactNode, Dispatch } from "react";
+import React, {
+  createContext,
+  useReducer,
+  ReactNode,
+  Dispatch,
+  useEffect,
+} from "react";
 import { CartState } from "../interfaces/Cart";
 import { ProductDetail } from "@/interfaces/Products";
+import { useAuth } from "@/contexts/AuthContext"; // Import the authentication context
 
 type CartAction =
   | { type: "ADD_TO_CART"; payload: ProductDetail }
@@ -12,6 +19,17 @@ type CartAction =
 const initialState: CartState = {
   items: [],
   totalAmount: 0,
+};
+
+// Helper function to get the initial state from localStorage
+const getInitialState = (userId: string | null): CartState => {
+  if (typeof window !== "undefined" && userId) {
+    const storedCart = localStorage.getItem(`cart_${userId}`);
+    if (storedCart) {
+      return JSON.parse(storedCart);
+    }
+  }
+  return initialState;
 };
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
@@ -41,7 +59,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
     case "REMOVE_FROM_CART":
       const filteredItems = state.items.filter(
-        (item) => item.id !== action.payload.id
+        (item) => item.product_id !== action.payload.product_id
       );
 
       return {
@@ -68,7 +86,20 @@ export const CartContext = createContext<CartContextProps>({
 });
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, initialState);
+  const { userData } = useAuth(); // Get the logged-in user data
+  const userId = userData ? userData.id : null; // Extract the user ID
+
+  const [state, dispatch] = useReducer(
+    cartReducer,
+    getInitialState(userId) // Pass the user ID to get the initial state
+  );
+
+  // Synchronize the cart state with localStorage
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem(`cart_${userId}`, JSON.stringify(state));
+    }
+  }, [state, userId]);
 
   return (
     <CartContext.Provider value={{ state, dispatch }}>

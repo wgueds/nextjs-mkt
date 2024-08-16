@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import ImageSlider from "@/components/ImageSlider";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -12,7 +14,15 @@ import { getProduct } from "@/services/ProductsService";
 import { ProductDetail } from "@/interfaces/Products";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProductNotFound from "@/components/ProductNotFound";
-// import { CartItem } from "@/interfaces/Cart";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface PageProps {
   params: {
@@ -31,11 +41,14 @@ const Page = ({ params }: PageProps) => {
   const { dispatch } = useCart();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await getProduct(parseInt(productId));
+
         setProduct(response?.data || null);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -83,7 +96,11 @@ const Page = ({ params }: PageProps) => {
   const validUrls = product.images.map((image) => image.url_image);
 
   const addToCart = (product: ProductDetail) => {
-    // console.log(product);
+    if (!isLoggedIn) {
+      router.push("/sign-in");
+      return;
+    }
+
     dispatch({ type: "ADD_TO_CART", payload: product });
   };
 
@@ -117,13 +134,13 @@ const Page = ({ params }: PageProps) => {
               ))}
             </ol>
 
-            <div className="mt-4">
+            <div className="py-4">
               <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                 {product.name}
               </h1>
             </div>
 
-            <section className="mt-4">
+            <section className="py-4">
               <div className="flex items-center">
                 <p className="font-medium text-gray-900">
                   {formatPrice(product.price)}
@@ -139,6 +156,32 @@ const Page = ({ params }: PageProps) => {
                   {product.description}
                 </p>
               </div>
+            </section>
+
+            <section className="py-4">
+              <h1 className="text-xl font-bold text-gray-900 sm:text-xl">
+                Caracteristicas
+              </h1>
+
+              {product.features && product.features.length > 0 ? (
+                <Table>
+                  <TableCaption>Caracteristicas do produto.</TableCaption>
+                  <TableBody>
+                    {product.features.map((feature, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">
+                          {feature.key}
+                        </TableCell>
+                        <TableCell>{feature.value}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">
+                  Este produto não possui características adicionais.
+                </p>
+              )}
             </section>
           </div>
 
