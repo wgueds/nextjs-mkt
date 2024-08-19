@@ -100,7 +100,7 @@ const Cart = () => {
               <SheetFooter>
                 <SheetTrigger asChild>
                   <Link
-                    href="/cart"
+                    href="/checkout"
                     className={buttonVariants({
                       className: "w-full",
                     })}
