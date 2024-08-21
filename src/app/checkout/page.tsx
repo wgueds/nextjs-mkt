@@ -39,6 +39,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
+import { sendPayment } from "@/services/SaleServices";
+import PaymentMethods from "@/components/PaymentMethods";
+import { getPaymentMethods } from "@/services/PaymentMethodsService";
 
 interface PageProps {
   params: {
@@ -73,21 +76,44 @@ const months = [
 ];
 
 const formSchema = z.object({
-  paymentMethod: z.enum(["pix", "cc", "cripto"]),
+  paymentMethod: z.enum(["pix", "cc", "cryptocurrency"]),
 });
 
 const Page = ({ params }: PageProps) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userToken } = useAuth();
   const { state, dispatch } = useCart();
   const router = useRouter();
   const [selectedCrypto, setSelectedCrypto] = useState<string>("option-one");
   const years = generateYears();
+  const [paymentMethods, setPaymentMethods] = useState<Record<string, any>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!isLoggedIn) {
       router.push("/sign-in");
     }
   }, [isLoggedIn, router]);
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const response = await getPaymentMethods();
+
+        console.log(response);
+
+        if (response.success) {
+          setPaymentMethods(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, [paymentMethods]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -96,9 +122,43 @@ const Page = ({ params }: PageProps) => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const { paymentMethod } = values;
+
+    let paymentDetails = {};
+
+    if (paymentMethod === "cc") {
+      const cardData = {
+        name: (document.getElementById("cc_name") as HTMLInputElement).value,
+        number: (document.getElementById("cc_number") as HTMLInputElement)
+          .value,
+        year: years[0], // você pode ajustar para pegar o valor real do select
+        month: months[0].value, // você pode ajustar para pegar o valor real do select
+        cvc: (document.getElementById("cc_cvc") as HTMLInputElement).value,
+      };
+      paymentDetails = { method: "credit_card", details: cardData };
+    } else if (paymentMethod === "cryptocurrency") {
+      paymentDetails = { method: "cryptocurrency", details: selectedCrypto };
+    } else {
+      paymentDetails = { method: "pix" };
+    }
+
+    const payload = {
+      items: state.items.map((item) => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+      })),
+      totalAmount: state.totalAmount,
+      payment: paymentDetails,
+    };
+
+    try {
+      const response = await sendPayment(payload, userToken);
+      console.log("Compra finalizada com sucesso", response);
+    } catch (error) {
+      console.error("Erro ao finalizar a compra", error);
+    }
+  };
 
   return (
     <>
@@ -156,7 +216,6 @@ const Page = ({ params }: PageProps) => {
                       {state.items.map((item) => (
                         <TableRow key={item.product_id}>
                           <TableCell>
-                            {/* Exibe a primeira imagem do produto */}
                             {item.images.length > 0 && (
                               <img
                                 src={item.images[0].url_image}
@@ -180,15 +239,6 @@ const Page = ({ params }: PageProps) => {
                     </TableBody>
                   </Table>
                 </div>
-
-                <div className="space-y-4 pr-6">
-                  <div className="space-y-1.5 text-sm">
-                    <div className="flex">
-                      <span className="flex-1">Total</span>
-                      <span>{formatPrice(state.totalAmount)}</span>
-                    </div>
-                  </div>
-                </div>
               </section>
             </div>
 
@@ -211,128 +261,157 @@ const Page = ({ params }: PageProps) => {
                         control={form.control}
                         name="paymentMethod"
                         render={({ field }) => (
-                          <Tabs
-                            value={field.value} // Garante que o valor do campo é controlado pelo Tabs
-                            onValueChange={(value) => field.onChange(value)}
-                            className="w-[400px]"
-                          >
-                            <TabsList>
-                              <TabsTrigger value="pix">PIX</TabsTrigger>
-                              <TabsTrigger value="cc">
-                                Cartão de crédito
-                              </TabsTrigger>
-                              <TabsTrigger value="cripto">
-                                Criptomoedas
-                              </TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="pix" className="mt-4">
-                              <p className="text-xs text-muted-foreground italic">
-                                * Um QR code será criado com o código do
-                                pagamento
-                              </p>
-                            </TabsContent>
-                            <TabsContent value="cc" className="mt-4">
-                              <div className="w-full flex flex-col gap-4">
-                                <div className="grid w-full max-w-sm items-center gap-1.5">
-                                  <Label htmlFor="email">Nome</Label>
-                                  <Input
-                                    type="text"
-                                    id="cc_name"
-                                    placeholder="Nome"
-                                  />
-                                </div>
-                                <div className="grid w-full max-w-sm items-center gap-1.5">
-                                  <Label htmlFor="email">Número</Label>
-                                  <Input
-                                    type="text"
-                                    id="cc_number"
-                                    placeholder="Número"
-                                  />
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-2">
-                                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                                    <Label htmlFor="email">Ano</Label>
-                                    <Select>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Ano" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {years.map((year) => (
-                                          <SelectItem
-                                            key={year}
-                                            value={year.toString()}
-                                          >
-                                            {year}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                                    <Label htmlFor="email">Mês</Label>
-                                    <Select>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Mês" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {months.map((month) => (
-                                          <SelectItem
-                                            key={month.value}
-                                            value={month.value}
-                                          >
-                                            {month.label}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                                    <Label htmlFor="email">CVC</Label>
-                                    <Input
-                                      type="text"
-                                      id="cc_cvc"
-                                      placeholder="CVC"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </TabsContent>
-                            <TabsContent value="cripto" className="mt-4">
-                              <p className="text-xs text-muted-foreground italic pb-5">
-                                * Selecione uma criptomoeda
-                              </p>
-                              <RadioGroup
-                                name="payment-method-crypto"
-                                value={selectedCrypto}
-                                onValueChange={(value) =>
-                                  setSelectedCrypto(value)
-                                }
+                          <>
+                            {isLoading ? (
+                              <div>Buscando formas de pagamento...</div>
+                            ) : (
+                              <Tabs
+                                defaultValue={Object.keys(
+                                  paymentMethods
+                                )[0].toLowerCase()}
+                                className="w-full"
                               >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem
-                                    value="USDT"
-                                    id="payment-method-crypto-usdt"
-                                  />
-                                  <Label htmlFor="payment-method-crypto-usdt">
-                                    USDT
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem
-                                    value="BNB"
-                                    id="payment-method-crypto-bnb"
-                                  />
-                                  <Label htmlFor="payment-method-crypto-bnb">
-                                    BNB
-                                  </Label>
-                                </div>
-                              </RadioGroup>
-                            </TabsContent>
-                          </Tabs>
+                                <TabsList>
+                                  {Object.keys(paymentMethods).map((method) => (
+                                    <TabsTrigger key={method} value={method}>
+                                      {paymentMethods[method][0].name}
+                                    </TabsTrigger>
+                                  ))}
+                                </TabsList>
+
+                                {Object.entries(paymentMethods).map(
+                                  ([method, details]) => (
+                                    <TabsContent
+                                      key={method}
+                                      value={method}
+                                      className="mt-4"
+                                    >
+                                      {method === "credit-card" && (
+                                        <div className="w-full flex flex-col gap-4">
+                                          <div className="grid w-full max-w-sm items-center gap-1.5">
+                                            <Label htmlFor="email">Nome</Label>
+                                            <Input
+                                              type="text"
+                                              id="cc_name"
+                                              placeholder="Nome"
+                                            />
+                                          </div>
+                                          <div className="grid w-full max-w-sm items-center gap-1.5">
+                                            <Label htmlFor="email">
+                                              Número
+                                            </Label>
+                                            <Input
+                                              type="text"
+                                              id="cc_number"
+                                              placeholder="Número"
+                                            />
+                                          </div>
+
+                                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-2">
+                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                              <Label htmlFor="email">Ano</Label>
+                                              <Select>
+                                                <SelectTrigger>
+                                                  <SelectValue placeholder="Ano" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  {years.map((year) => (
+                                                    <SelectItem
+                                                      key={year}
+                                                      value={year.toString()}
+                                                    >
+                                                      {year}
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                              <Label htmlFor="email">Mês</Label>
+                                              <Select>
+                                                <SelectTrigger>
+                                                  <SelectValue placeholder="Mês" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  {months.map((month) => (
+                                                    <SelectItem
+                                                      key={month.value}
+                                                      value={month.value}
+                                                    >
+                                                      {month.label}
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                              <Label htmlFor="email">CVC</Label>
+                                              <Input
+                                                type="text"
+                                                id="cc_cvc"
+                                                placeholder="CVC"
+                                              />
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {method === "pix" && (
+                                        <p className="text-xs text-muted-foreground italic">
+                                          * Um QR code será criado com o código
+                                          do pagamento.
+                                        </p>
+                                      )}
+
+                                      {method === "cryptocurrency" && (
+                                        <>
+                                          <p className="text-xs text-muted-foreground italic pb-5">
+                                            * Selecione uma criptomoeda
+                                          </p>
+                                          <RadioGroup
+                                            name="payment-method-crypto"
+                                            value={selectedCrypto}
+                                            onValueChange={(value) =>
+                                              setSelectedCrypto(value)
+                                            }
+                                          >
+                                            {details.map((crypto: any) => (
+                                              <div
+                                                key={crypto.hash}
+                                                className="flex items-center space-x-2"
+                                              >
+                                                <RadioGroupItem
+                                                  value={crypto.coin}
+                                                  id={`payment-method-crypto-${crypto.coin.toLowerCase()}`}
+                                                />
+                                                <Label
+                                                  htmlFor={`payment-method-crypto-${crypto.coin.toLowerCase()}`}
+                                                >
+                                                  {crypto.coin}
+                                                </Label>
+                                              </div>
+                                            ))}
+                                          </RadioGroup>
+                                        </>
+                                      )}
+                                    </TabsContent>
+                                  )
+                                )}
+                              </Tabs>
+                            )}
+                          </>
                         )}
                       />
+
+                      <div className="space-y-4 pr-6">
+                        <div className="space-y-1.5 text-sm">
+                          <div className="flex">
+                            <span className="flex-1">Total</span>
+                            <span>{formatPrice(state.totalAmount)}</span>
+                          </div>
+                        </div>
+                      </div>
+
                       <Button type="submit" className={buttonVariants()}>
                         Finalizar pedido
                       </Button>
