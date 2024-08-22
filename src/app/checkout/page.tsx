@@ -3,6 +3,8 @@
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -42,6 +44,7 @@ import { formatPrice } from "@/lib/utils";
 import { sendPayment } from "@/services/SaleServices";
 import PaymentMethods from "@/components/PaymentMethods";
 import { getPaymentMethods } from "@/services/PaymentMethodsService";
+import QRCodeGenerate from "@/components/QRCodeGenerate";
 
 interface PageProps {
   params: {
@@ -76,17 +79,27 @@ const months = [
 ];
 
 const formSchema = z.object({
-  paymentMethod: z.enum(["pix", "cc", "cryptocurrency"]),
+  paymentMethod: z.enum(["pix", "credit-card", "cryptocurrency"]),
 });
 
 const Page = ({ params }: PageProps) => {
   const { isLoggedIn, userToken } = useAuth();
   const { state, dispatch } = useCart();
   const router = useRouter();
-  const [selectedCrypto, setSelectedCrypto] = useState<string>("option-one");
   const years = generateYears();
   const [paymentMethods, setPaymentMethods] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const [qrcode, setQrcode] = useState(null);
+  const [selectedCrypto, setSelectedCrypto] = useState<string>("USDT");
+  const [selectedMethod, setSelectedMethod] = useState<string>("pix");
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      paymentMethod: "pix",
+    },
+  });
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -99,48 +112,76 @@ const Page = ({ params }: PageProps) => {
       try {
         const response = await getPaymentMethods();
 
-        console.log(response);
-
         if (response.success) {
           setPaymentMethods(response.data);
         }
       } catch (error) {
         console.log(error);
-        console.error("Failed to fetch products:", error);
+        // console.error("Failed to fetch products:", error);
+        // toast.error("Failed to fetch products:);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPaymentMethods();
-  }, [paymentMethods]);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      paymentMethod: "pix",
-    },
-  });
+  }, []);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSending(true);
     const { paymentMethod } = values;
+
+    let _paymentMethod = paymentMethods[selectedMethod]?.[0];
+    let _hash = null;
+    let _coin = null;
+
+    if (_paymentMethod) {
+      _hash = _paymentMethod.hash;
+      _coin = _paymentMethod.coin;
+
+      if (_paymentMethod.slug === "cryptocurrency") {
+        _hash = selectedCrypto.hash;
+        _coin = selectedCrypto.coin;
+      }
+    }
 
     let paymentDetails = {};
 
-    if (paymentMethod === "cc") {
-      const cardData = {
-        name: (document.getElementById("cc_name") as HTMLInputElement).value,
-        number: (document.getElementById("cc_number") as HTMLInputElement)
-          .value,
-        year: years[0], // você pode ajustar para pegar o valor real do select
-        month: months[0].value, // você pode ajustar para pegar o valor real do select
-        cvc: (document.getElementById("cc_cvc") as HTMLInputElement).value,
-      };
-      paymentDetails = { method: "credit_card", details: cardData };
-    } else if (paymentMethod === "cryptocurrency") {
-      paymentDetails = { method: "cryptocurrency", details: selectedCrypto };
-    } else {
-      paymentDetails = { method: "pix" };
+    // prepare payment data
+    switch (paymentMethod) {
+      case "credit-card":
+        const cardData = {
+          name: (document.getElementById("cc_name") as HTMLInputElement).value,
+          number: (document.getElementById("cc_number") as HTMLInputElement)
+            .value,
+          year: years[0],
+          month: months[0].value,
+          cvc: (document.getElementById("cc_cvc") as HTMLInputElement).value,
+        };
+        paymentDetails = {
+          method: "credit_card",
+          method_hash: _hash,
+          method_coin: _coin,
+          details: cardData,
+        };
+        break;
+
+      case "cryptocurrency":
+        paymentDetails = {
+          method: "cryptocurrency",
+          method_hash: _hash,
+          method_coin: _coin,
+          details: selectedCrypto,
+        };
+        break;
+
+      default:
+        paymentDetails = {
+          method: "pix",
+          method_hash: _hash,
+          method_coin: _coin,
+        };
+        break;
     }
 
     const payload = {
@@ -154,9 +195,28 @@ const Page = ({ params }: PageProps) => {
 
     try {
       const response = await sendPayment(payload, userToken);
-      console.log("Compra finalizada com sucesso", response);
+
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+
+      //   console.log(response);
+
+      if (response.data.qrcode_string) {
+        const query = new URLSearchParams({
+          qrcode: response.data.qrcode_string,
+        }).toString();
+        router.push(`/checkout/result?${query}`);
+      } else {
+        router.push(`/checkout/result`);
+      }
+
+      dispatch({ type: "CLEAR_CART" });
     } catch (error) {
       console.error("Erro ao finalizar a compra", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -269,6 +329,8 @@ const Page = ({ params }: PageProps) => {
                                 defaultValue={Object.keys(
                                   paymentMethods
                                 )[0].toLowerCase()}
+                                value={selectedMethod}
+                                onValueChange={setSelectedMethod}
                                 className="w-full"
                               >
                                 <TabsList>
@@ -357,41 +419,53 @@ const Page = ({ params }: PageProps) => {
                                       )}
 
                                       {method === "pix" && (
-                                        <p className="text-xs text-muted-foreground italic">
-                                          * Um QR code será criado com o código
-                                          do pagamento.
-                                        </p>
+                                        <>
+                                          {qrcode ? (
+                                            <QRCodeGenerate value={qrcode} />
+                                          ) : (
+                                            <p className="text-xs text-muted-foreground italic">
+                                              * Um QR code será criado com o
+                                              código do pagamento.
+                                            </p>
+                                          )}
+                                        </>
                                       )}
 
                                       {method === "cryptocurrency" && (
                                         <>
-                                          <p className="text-xs text-muted-foreground italic pb-5">
-                                            * Selecione uma criptomoeda
-                                          </p>
-                                          <RadioGroup
-                                            name="payment-method-crypto"
-                                            value={selectedCrypto}
-                                            onValueChange={(value) =>
-                                              setSelectedCrypto(value)
-                                            }
-                                          >
-                                            {details.map((crypto: any) => (
-                                              <div
-                                                key={crypto.hash}
-                                                className="flex items-center space-x-2"
+                                          {qrcode ? (
+                                            <QRCodeGenerate value={qrcode} />
+                                          ) : (
+                                            <>
+                                              <p className="text-xs text-muted-foreground italic pb-5">
+                                                * Selecione uma criptomoeda
+                                              </p>
+                                              <RadioGroup
+                                                name="payment-method-crypto"
+                                                value={selectedCrypto}
+                                                onValueChange={(value) =>
+                                                  setSelectedCrypto(value)
+                                                }
                                               >
-                                                <RadioGroupItem
-                                                  value={crypto.coin}
-                                                  id={`payment-method-crypto-${crypto.coin.toLowerCase()}`}
-                                                />
-                                                <Label
-                                                  htmlFor={`payment-method-crypto-${crypto.coin.toLowerCase()}`}
-                                                >
-                                                  {crypto.coin}
-                                                </Label>
-                                              </div>
-                                            ))}
-                                          </RadioGroup>
+                                                {details.map((crypto: any) => (
+                                                  <div
+                                                    key={crypto.hash}
+                                                    className="flex items-center space-x-2"
+                                                  >
+                                                    <RadioGroupItem
+                                                      value={crypto}
+                                                      id={`payment-method-crypto-${crypto.coin.toLowerCase()}`}
+                                                    />
+                                                    <Label
+                                                      htmlFor={`payment-method-crypto-${crypto.coin.toLowerCase()}`}
+                                                    >
+                                                      {crypto.coin}
+                                                    </Label>
+                                                  </div>
+                                                ))}
+                                              </RadioGroup>
+                                            </>
+                                          )}
                                         </>
                                       )}
                                     </TabsContent>
@@ -412,7 +486,14 @@ const Page = ({ params }: PageProps) => {
                         </div>
                       </div>
 
-                      <Button type="submit" className={buttonVariants()}>
+                      <Button
+                        type="submit"
+                        className={buttonVariants()}
+                        disabled={isSending}
+                      >
+                        {isSending && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
                         Finalizar pedido
                       </Button>
                     </form>

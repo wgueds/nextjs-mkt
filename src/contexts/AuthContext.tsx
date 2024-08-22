@@ -13,7 +13,7 @@ import React, {
 interface AuthContextProps {
   isLoggedIn: boolean;
   userData: User | null;
-  userToken: null;
+  userToken: string | null;
   login: (userData: User) => void;
   logout: () => void;
   setIsLoggedIn: (loggedIn: boolean) => void;
