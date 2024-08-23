@@ -11,8 +11,10 @@ import {
 import Link from "next/link";
 import { User } from "@/interfaces/User";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 const UserAccountNav = ({ user }: { user: User }) => {
+  const router = useRouter();
   const { userData, logout } = useAuth();
 
   return (
@@ -34,7 +36,7 @@ const UserAccountNav = ({ user }: { user: User }) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild>
-          <Link href="http://localhost:5500/admin">Área do vendedor</Link>
+          <Link href="/orders">Área do cliente</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={logout} className="cursor-pointer">

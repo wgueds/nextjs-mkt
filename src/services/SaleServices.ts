@@ -13,3 +13,16 @@ export const sendPayment = async (
     },
   });
 };
+
+export const getOrders = async (
+  page: number,
+  perPage: number,
+  sort?: string
+) => {
+  return apiFetch(`/sales?sort=${sort}&page=${page}&per_page=${perPage}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
