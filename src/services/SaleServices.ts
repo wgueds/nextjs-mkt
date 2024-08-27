@@ -26,3 +26,12 @@ export const getOrders = async (
     },
   });
 };
+
+export const getOrder = async (identifier: string) => {
+  return apiFetch(`/sales/${identifier}/detail`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};

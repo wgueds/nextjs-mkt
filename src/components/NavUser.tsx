@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import Link from "next/link";
 
 const NavUser = () => {
   return (
@@ -17,9 +18,34 @@ const NavUser = () => {
       </AccordionItem>
       <AccordionItem value="item-2">
         <AccordionTrigger>Meus pedidos</AccordionTrigger>
-        <AccordionContent>Pendentes</AccordionContent>
-        <AccordionContent>Concluídos</AccordionContent>
-        <AccordionContent>Cancelados</AccordionContent>
+        <AccordionContent>
+          <Link href="/orders?sort=completed">Concluídos</Link>
+          {/* <Link href={{ pathname: "orders", query: { sort: "completed" } }}>
+            Concluídos
+          </Link> */}
+          {/* <Link
+            href="/orders?sort=completed"
+            className="mt-6 block font-medium text-gray-900"
+          >
+            Concluídos
+          </Link> */}
+        </AccordionContent>
+        <AccordionContent>
+          <Link
+            href="/orders?sort=pendding"
+            className="mt-6 block font-medium text-gray-900"
+          >
+            Pendentes
+          </Link>
+        </AccordionContent>
+        <AccordionContent>
+          <Link
+            href="/orders?sort=canceled"
+            className="mt-6 block font-medium text-gray-900"
+          >
+            Cancelados
+          </Link>
+        </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">
         <AccordionTrigger>Minha loja</AccordionTrigger>
