@@ -19,16 +19,12 @@ const NavUser = () => {
       <AccordionItem value="item-2">
         <AccordionTrigger>Meus pedidos</AccordionTrigger>
         <AccordionContent>
-          <Link href="/orders?sort=completed">Concluídos</Link>
-          {/* <Link href={{ pathname: "orders", query: { sort: "completed" } }}>
-            Concluídos
-          </Link> */}
-          {/* <Link
+          <Link
             href="/orders?sort=completed"
             className="mt-6 block font-medium text-gray-900"
           >
             Concluídos
-          </Link> */}
+          </Link>
         </AccordionContent>
         <AccordionContent>
           <Link

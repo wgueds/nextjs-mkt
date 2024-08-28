@@ -6,8 +6,6 @@ import { Icons } from "./Icons";
 import NavItems from "./NavItems";
 import { buttonVariants } from "./ui/button";
 import Cart from "./Cart";
-import { User } from "@/interfaces/User";
-import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import UserAccountNav from "./UserAccountNav";
 
@@ -34,7 +32,7 @@ const Navbar = () => {
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  {userData ? null : (
+                  {!userData && (
                     <Link
                       href="/sign-in"
                       className={buttonVariants({
@@ -45,7 +43,7 @@ const Navbar = () => {
                     </Link>
                   )}
 
-                  {userData ? null : (
+                  {!userData && (
                     <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
                   )}
 

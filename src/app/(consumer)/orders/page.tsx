@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { getOrders } from "@/services/SaleServices";
 import { Sale } from "@/interfaces/Sale";
-import { View } from "lucide-react";
+import { View, Loader2 } from "lucide-react";
 import RequireAuth from "@/components/RequireAuth";
 
 const BREADCRUMBS = [
@@ -28,6 +28,7 @@ const Page = () => {
   const [orders, setOrders] = useState<Sale[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const perPage = 10;
 
   const searchParams = useSearchParams();
@@ -37,22 +38,24 @@ const Page = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      setOrders([]);
+      setIsLoading(true);
+
       const response = await getOrders(currentPage, perPage, sort);
       const { data } = response;
 
       if (Array.isArray(data.data)) {
         setOrders(data.data);
-      } else {
-        setOrders([]);
       }
 
       console.log(data);
 
       setTotalPages(data.last_page || 1);
+      setIsLoading(false);
     };
 
     fetchOrders();
-  }, [currentPage]);
+  }, [currentPage, sort]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -101,7 +104,15 @@ const Page = () => {
 
               <section className="py-4">
                 <Table>
-                  <TableCaption>Lista de seus pedidos recentes.</TableCaption>
+                  {orders.length === 0 && (
+                    <TableCaption>
+                      {isLoading ? (
+                        <Loader2 className="animate-spin h-5 w-5 text-zinc-300" />
+                      ) : (
+                        <>Nenhum item encontrado</>
+                      )}
+                    </TableCaption>
+                  )}
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[100px]">Identificador</TableHead>

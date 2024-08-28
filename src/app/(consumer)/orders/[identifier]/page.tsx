@@ -9,7 +9,6 @@ import { Sale } from "@/interfaces/Sale";
 import Link from "next/link";
 import { Loader2, LucideImage } from "lucide-react";
 import RequireAuth from "@/components/RequireAuth";
-import { Button } from "@/components/ui/button";
 import QRCodeGenerate from "@/components/QRCodeGenerate";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -234,52 +233,8 @@ const Page = () => {
                         </TableBody>
                       </Table>
                     </CardContent>
-                    {/* <CardFooter className="flex justify-between">
-                      <Button variant="outline">Cancel</Button>
-                      <Button>Deploy</Button>
-                    </CardFooter> */}
                   </Card>
                 </div>
-
-                {/* <div className="mt-4">
-                  <h2 className="text-xl font-semibold">Identificador:</h2>
-                  <p>{order.identifier}</p>
-                </div>
-
-                <div className="mt-4">
-                  <h2 className="text-xl font-semibold">Status:</h2>
-                  <p>{order.status}</p>
-                </div>
-
-                <div className="mt-4">
-                  <h2 className="text-xl font-semibold">Total:</h2>
-                  <p>
-                    {order.coin} {order.total}
-                  </p>
-                </div>
-
-                <div className="mt-4">
-                  <h2 className="text-xl font-semibold">Data de Criação:</h2>
-                  <p>{order.created_at}</p>
-                </div>
-
-                <div className="mt-4">
-                  <h2 className="text-xl font-semibold">Itens do Pedido:</h2>
-                  <ul>
-                    {order.items.map((item) => (
-                      <li key={item.id} className="mb-2">
-                        {item.quantity} x {item.price} ({item.created_at})
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <button
-                  className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  onClick={() => router.back()}
-                >
-                  Voltar
-                </button> */}
               </section>
             </div>
           </section>

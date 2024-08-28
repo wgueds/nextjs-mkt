@@ -10,7 +10,10 @@ const RequireAuth = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log(isLoggedIn);
+
     if (!isLoggedIn) {
+      console.log("login");
       router.push("/sign-in");
     }
   }, [isLoggedIn, router]);

@@ -24,19 +24,23 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userToken, setUserToken] = useState(null);
+  const [userToken, setUserToken] = useState<string | null>(null);
   const [userData, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const storedUser = Cookies.get("_user");
     const storedUserToken = Cookies.get("_token");
+    const storedIsLoggedIn = Cookies.get("_isLoggedIn");
 
-    if (storedUser) {
+    if (storedIsLoggedIn === "1" && storedUser && storedUserToken) {
       setUser(JSON.parse(storedUser));
+      setUserToken(storedUserToken);
       setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+      setUser(null);
+      setUserToken(null);
     }
-
-    if (storedUserToken) setUserToken(storedUserToken);
   }, []);
 
   const login = (userData: User) => {
@@ -47,9 +51,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setIsLoggedIn(false);
     setUser(null);
+    setUserToken(null);
 
     Cookies.remove("_user");
     Cookies.remove("_token");
+    Cookies.remove("_isLoggedIn");
   };
 
   return (

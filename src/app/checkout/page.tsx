@@ -93,6 +93,8 @@ const Page = ({ params }: PageProps) => {
   const [qrcode, setQrcode] = useState(null);
   const [selectedCrypto, setSelectedCrypto] = useState<string>("USDT");
   const [selectedMethod, setSelectedMethod] = useState<string>("pix");
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -148,14 +150,14 @@ const Page = ({ params }: PageProps) => {
     let paymentDetails = {};
 
     // prepare payment data
-    switch (paymentMethod) {
+    switch (selectedMethod) {
       case "credit-card":
         const cardData = {
           name: (document.getElementById("cc_name") as HTMLInputElement).value,
           number: (document.getElementById("cc_number") as HTMLInputElement)
             .value,
-          year: years[0],
-          month: months[0].value,
+          year: selectedYear,
+          month: selectedMonth,
           cvc: (document.getElementById("cc_cvc") as HTMLInputElement).value,
         };
         paymentDetails = {
@@ -372,7 +374,9 @@ const Page = ({ params }: PageProps) => {
                                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-2">
                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                               <Label htmlFor="email">Ano</Label>
-                                              <Select>
+                                              <Select
+                                                onValueChange={setSelectedYear}
+                                              >
                                                 <SelectTrigger>
                                                   <SelectValue placeholder="Ano" />
                                                 </SelectTrigger>
@@ -390,7 +394,9 @@ const Page = ({ params }: PageProps) => {
                                             </div>
                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                               <Label htmlFor="email">Mês</Label>
-                                              <Select>
+                                              <Select
+                                                onValueChange={setSelectedMonth}
+                                              >
                                                 <SelectTrigger>
                                                   <SelectValue placeholder="Mês" />
                                                 </SelectTrigger>

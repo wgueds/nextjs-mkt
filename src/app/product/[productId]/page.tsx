@@ -14,6 +14,7 @@ import { getProduct } from "@/services/ProductsService";
 import { ProductDetail } from "@/interfaces/Products";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProductNotFound from "@/components/ProductNotFound";
+import RequireAuth from "@/components/RequireAuth";
 import {
   Table,
   TableBody,
@@ -105,6 +106,7 @@ const Page = ({ params }: PageProps) => {
   };
 
   return (
+    // <RequireAuth>
     <MaxWidthWrapper className="bg-white">
       <div className="bg-white">
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
@@ -206,6 +208,7 @@ const Page = ({ params }: PageProps) => {
         </div>
       </div>
     </MaxWidthWrapper>
+    // </RequireAuth>
   );
 };
 
