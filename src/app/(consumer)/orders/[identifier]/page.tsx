@@ -106,11 +106,13 @@ const Page = () => {
   //   );
   // }
 
-  const formattedDate = format(
-    new Date(order.created_at),
-    "d 'de' MMMM 'de' yyyy",
-    { locale: ptBR }
-  );
+  // if (order) {
+  //   const formattedDate = format(
+  //     new Date(order.created_at),
+  //     "d 'de' MMMM 'de' yyyy",
+  //     { locale: ptBR }
+  //   );
+  // }
 
   return (
     <>
@@ -173,7 +175,12 @@ const Page = () => {
                       Detalhes do pedido
                     </h1>
                     <p className="text-xs italic text-gray-400">
-                      Pedido realizado em {formattedDate}
+                      Pedido realizado em{" "}
+                      {format(
+                        new Date(order.created_at),
+                        "d 'de' MMMM 'de' yyyy",
+                        { locale: ptBR }
+                      )}
                     </p>
                   </div>
 
