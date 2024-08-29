@@ -34,7 +34,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Form, FormField } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,9 +42,9 @@ import { useCart } from "@/hooks/useCart";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
 import { sendPayment } from "@/services/SaleServices";
-import PaymentMethods from "@/components/PaymentMethods";
 import { getPaymentMethods } from "@/services/PaymentMethodsService";
 import QRCodeGenerate from "@/components/QRCodeGenerate";
+import InputMask from "react-input-mask";
 
 interface PageProps {
   params: {
@@ -78,8 +78,29 @@ const months = [
   { value: "12", label: "Dezembro" },
 ];
 
+const brands = [
+  { value: "visa", label: "Visa" },
+  { value: "mastercard", label: "Mastercard" },
+  { value: "elo", label: "ELO" },
+  { value: "amex", label: "Amex" },
+  { value: "diners", label: "Diners" },
+  { value: "discover", label: "Discover" },
+  { value: "hipercard", label: "Hipercard" },
+  { value: "hiper", label: "Hiper" },
+  { value: "jcb", label: "JCB" },
+  { value: "aura", label: "Aura" },
+  { value: "visaelectron", label: "Visa electron" },
+  { value: "maestro", label: "Maestro" },
+];
+
 const formSchema = z.object({
   paymentMethod: z.enum(["pix", "credit-card", "cryptocurrency"]),
+  cc_name: z.string().optional(),
+  cc_number: z.string().optional(),
+  cc_month: z.string().optional(),
+  cc_year: z.string().optional(),
+  cc_cvc: z.string().optional(),
+  cc_brand: z.string().optional(),
 });
 
 const Page = ({ params }: PageProps) => {
@@ -95,6 +116,7 @@ const Page = ({ params }: PageProps) => {
   const [selectedMethod, setSelectedMethod] = useState<string>("pix");
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -153,12 +175,12 @@ const Page = ({ params }: PageProps) => {
     switch (selectedMethod) {
       case "credit-card":
         const cardData = {
-          name: (document.getElementById("cc_name") as HTMLInputElement).value,
-          number: (document.getElementById("cc_number") as HTMLInputElement)
-            .value,
+          name: values.cc_name,
+          number: values.cc_number,
+          brand: selectedBrand,
           year: selectedYear,
           month: selectedMonth,
-          cvc: (document.getElementById("cc_cvc") as HTMLInputElement).value,
+          cvc: values.cc_cvc,
         };
         paymentDetails = {
           method: "credit_card",
@@ -352,23 +374,66 @@ const Page = ({ params }: PageProps) => {
                                     >
                                       {method === "credit-card" && (
                                         <div className="w-full flex flex-col gap-4">
-                                          <div className="grid w-full max-w-sm items-center gap-1.5">
+                                          <div className="grid w-full items-center gap-1.5">
                                             <Label htmlFor="email">Nome</Label>
-                                            <Input
-                                              type="text"
-                                              id="cc_name"
-                                              placeholder="Nome"
+                                            <Controller
+                                              name="cc_name"
+                                              control={form.control}
+                                              render={({ field }) => (
+                                                <Input
+                                                  id="cc_name"
+                                                  {...field}
+                                                  placeholder="Nome"
+                                                />
+                                              )}
                                             />
                                           </div>
-                                          <div className="grid w-full max-w-sm items-center gap-1.5">
-                                            <Label htmlFor="email">
-                                              Número
-                                            </Label>
-                                            <Input
-                                              type="text"
-                                              id="cc_number"
-                                              placeholder="Número"
-                                            />
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 w-full items-center gap-1.5">
+                                            <div>
+                                              <Label htmlFor="email">
+                                                Número
+                                              </Label>
+                                              <Controller
+                                                name="cc_number"
+                                                control={form.control}
+                                                render={({ field }) => (
+                                                  <InputMask
+                                                    {...field}
+                                                    mask="9999 9999 9999 9999"
+                                                    maskChar={null}
+                                                  >
+                                                    {(inputProps) => (
+                                                      <Input
+                                                        id="cc_number"
+                                                        {...inputProps}
+                                                      />
+                                                    )}
+                                                  </InputMask>
+                                                )}
+                                              />
+                                            </div>
+                                            <div>
+                                              <Label htmlFor="email">
+                                                Bandeira
+                                              </Label>
+                                              <Select
+                                                onValueChange={setSelectedBrand}
+                                              >
+                                                <SelectTrigger>
+                                                  <SelectValue placeholder="Bandeira" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  {brands.map((item) => (
+                                                    <SelectItem
+                                                      key={item.value}
+                                                      value={item.value}
+                                                    >
+                                                      {item.label}
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
                                           </div>
 
                                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-2">
@@ -414,10 +479,20 @@ const Page = ({ params }: PageProps) => {
                                             </div>
                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                               <Label htmlFor="email">CVC</Label>
-                                              <Input
-                                                type="text"
-                                                id="cc_cvc"
-                                                placeholder="CVC"
+                                              <Controller
+                                                name="cc_cvc"
+                                                control={form.control}
+                                                render={({ field }) => (
+                                                  <InputMask
+                                                    {...field}
+                                                    mask="999"
+                                                    maskChar={null}
+                                                  >
+                                                    {(inputProps) => (
+                                                      <Input {...inputProps} />
+                                                    )}
+                                                  </InputMask>
+                                                )}
                                               />
                                             </div>
                                           </div>
