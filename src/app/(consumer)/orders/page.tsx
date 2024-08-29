@@ -135,7 +135,7 @@ const Page = () => {
                           {order.coin} {order.total}
                         </TableCell>
                         <TableCell className="text-right">
-                          {order.created_at}
+                          {order.created_at_string}
                         </TableCell>
                         <TableCell>
                           <Link href={`/orders/${order.identifier}`}>

@@ -13,6 +13,8 @@ import QRCodeGenerate from "@/components/QRCodeGenerate";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   Card,
   CardContent,
@@ -104,6 +106,12 @@ const Page = () => {
   //   );
   // }
 
+  const formattedDate = format(
+    new Date(order.created_at),
+    "d 'de' MMMM 'de' yyyy",
+    { locale: ptBR }
+  );
+
   return (
     <>
       <RequireAuth>
@@ -165,7 +173,7 @@ const Page = () => {
                       Detalhes do pedido
                     </h1>
                     <p className="text-xs italic text-gray-400">
-                      Pedido realizado em 28 de agosto de 2024
+                      Pedido realizado em {formattedDate}
                     </p>
                   </div>
 
@@ -203,7 +211,7 @@ const Page = () => {
                                 <TableCell className="font-medium">
                                   Data da criação
                                 </TableCell>
-                                <TableCell>{order.created_at}</TableCell>
+                                <TableCell>{order.created_at_string}</TableCell>
                               </TableRow>
                             </TableBody>
                             <TableFooter>
